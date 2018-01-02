@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  build:
+  test:
     machine:
       image: circleci/classic:edge
     steps:
@@ -12,13 +12,72 @@ jobs:
           name: docker-compose up
           command: docker-compose up -d
       - run:
-          name: sleep for waiting launch db
-          command: sleep 8
+          name: install mysql
+          command: sudo apt-get update && sudo apt-get install -y mysql-client
       - run:
-          name: before_test: setup db
+          name: sleep for waiting launch db
+          command: sleep 1
+      - run:
+          name: "before_test: setup db"
           command: docker-compose run web rails db:create db:migrate
       - run:
-          name: spec
+          name: bundle exec rspec
+          # command: docker-compose run web bundle exec rspec
           command: docker-compose run web bundle exec rspec spec/models/
       - run:
           name: docker-compose down
+          command: docker-compose down
+
+  deploy:
+    working_directory: ~/deploy
+    docker:
+      - image: docker:17.12.0-ce-git
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Install dependencies
+          command: |
+            apk update
+            apk add --no-cache \
+            py-pip jq curl curl-dev bash
+            pip install \
+            docker-compose \
+            awscli
+            curl https://raw.githubusercontent.com/silinternational/ecs-deploy/master/ecs-deploy \
+            | tee -a /usr/bin/ecs-deploy \
+            && chmod +x /usr/bin/ecs-deploy
+      - run:
+          name: Build application Docker image
+          command: |
+            docker build -t rails_sample -f docker/rails/Dockerfile.production . \
+            --build-arg AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+            --build-arg AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+      - run:
+          name: Push application Docker image to ECR
+          command: |
+            login="$(aws ecr get-login --no-include-email --region ap-northeast-1)"
+            ${login}
+            docker tag rails_sample $AWS_ACCOUNT_ID.dkr.ecr.ap-northeast-1.amazonaws.com/rails_sample:latest
+            docker push $AWS_ACCOUNT_ID.dkr.ecr.ap-northeast-1.amazonaws.com/rails_sample:latest
+      - run:
+          name: Deploy container
+          command: |
+            ecs-deploy \
+              --region ap-northeast-1 \
+              --cluster rails-sample-cluster \
+              --service-name rails-sample-service \
+              --image $AWS_ACCOUNT_ID.dkr.ecr.ap-northeast-1.amazonaws.com/rails_sample:latest \
+              --timeout 300
+
+workflows:
+  version: 2
+  test-deploy:
+    jobs:
+      - test
+      - deploy:
+          requires:
+            - test
+          filters:
+            branches:
+              only: master
