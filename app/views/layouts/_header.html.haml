@@ -1,0 +1,11 @@
+%header
+  %nav.navbar.navbar-expand-lg.navbar-dark.bg-primary
+    .container
+      .navbar-header
+        %a.navbar-brand{href: '/'} Latest Fav
+        %ul.navbar-nav
+          %li.nav-item
+            %a.nav-link{href: '/'} Home
+          %li.nav-item
+            - if logged_in?
+              %a.nav-link{href: '/logout'} ログアウト
