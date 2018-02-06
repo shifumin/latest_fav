@@ -3,13 +3,19 @@
     = link_to 'ログアウト', logout_path, class: 'btn btn-primary'
     = link_to '他のスクリーンネームで調べる', new_user_form_path, class: 'btn btn-primary'
   %p
-    - if @search_user
-      - if @lateset_favorite
-        = link_to("@#{@search_user}", "https://twitter.com/#{@search_user}")  + ' さんが一番最近いいねしたあなたのツイートはこのツイートです！！'
+    - if @searched_user_is_present
+      - if @late_five_favorites.present?
+        = link_to("@#{@searched_user}", "https://twitter.com/#{@searched_user}")  + ' さんが一番最近いいねしたあなたのツイートはこのツイートです！！'
         %blockquote.twitter-tweet(data-lang="ja")
-          %a(href="https://twitter.com/shifumin/status/#{@lateset_favorite.id}")
+          %a(href="https://twitter.com/shifumin/status/#{@late_five_favorites.first.id}")
         <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+        = '他の最近いいねされたツイートは以下です。'
+        - @late_five_favorites.each do |favorite|
+          - unless favorite == @late_five_favorites.first
+            %blockquote.twitter-tweet(data-lang="ja")
+              %a(href="https://twitter.com/shifumin/status/#{favorite.id}")
+                <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
       - else
-        = link_to("@#{@search_user}", "https://twitter.com/#{@search_user}")  + 'さんの直近200いいねの中にあなたのツイートはありませんでした:;(∩´﹏`∩);:'
+        = link_to("@#{@searched_user}", "https://twitter.com/#{@searched_user}")  + 'さんの直近200いいねの中にあなたのツイートはありませんでした:;(∩´﹏`∩);:'
     - else
-      = '入力されたスクリーンネームに該当するユーザーはいませんでした。'
+      = "入力されたスクリーンネーム @#{@searched_user} に該当するユーザーはいませんでした。"

@@ -4,13 +4,17 @@ class HomesController < ApplicationController
   def index; end
 
   def result
-    render and return unless twitter_client.user?(session[:search_user])
-    @search_user = session[:search_user]
+    @searched_user = session[:searched_user]
+    @searched_user_is_present = twitter_client.user?(@searched_user)
 
-    favorites = twitter_client.favorites(@search_user, count: 200)
-    @lateset_favorite = favorites.find do |favorite|
+    render and return unless @searched_user_is_present
+
+    favorites = twitter_client.favorites(@searched_user, count: 200)
+    late_favorites = favorites.find_all do |favorite|
       favorite.user.screen_name == @current_user.screen_name
     end
+
+    @late_five_favorites = late_favorites.take(5)
   end
 
   private

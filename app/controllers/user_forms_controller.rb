@@ -6,7 +6,7 @@ class UserFormsController < ApplicationController
   def create
     @user_form = UserForm.new(user_form_params)
     if @user_form.save
-      session[:search_user] = @user_form.screen_name
+      session[:searched_user] = @user_form.screen_name
       redirect_to result_path, notice: '検索'
     else
       render :new
