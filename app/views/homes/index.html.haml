@@ -1,14 +1,14 @@
 .container
   .content
     %p
-      %h2= '承認欲求を満たそう。'
+      %h5= 'Latest Fav は一番最近いいねされた自分のツイートを探せるサービスです。'
     %div
-      %p= 'Latest Fav は特定のユーザーから一番最近いいねされた自分のツイートを探せるサービスです。'
-      %p= 'このサービスが許可なくあなたのタイムラインに書き込むことはありません。'
+      %p= 'あの人からの一番最近いいねされたツイートを調べて承認欲求を充しましょう。'
+      %p= '※このサービスが許可なくあなたのタイムラインに書き込むことはありません。'
 
 
     %div
       - if logged_in?
-        = link_to 'スクリーンネームで調べる', new_user_form_path, class: 'btn btn-primary'
+        = link_to 'スクリーンネーム(ID)で調べる', new_user_form_path, class: 'btn btn-primary'
       - else
         = link_to 'Twitterでログイン', 'auth/twitter', class: 'btn btn-primary'
