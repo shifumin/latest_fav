@@ -1,3 +1,7 @@
+## 0.0.3
+
+- Introduce RSpec
+
 ## 0.0.2
 
 - Dispay up to five tweets
