@@ -12,18 +12,8 @@ jobs:
           name: docker-compose up
           command: docker-compose up -d
       - run:
-          name: install mysql
-          command: sudo apt-get update && sudo apt-get install -y mysql-client
-      - run:
-          name: sleep for waiting launch db
-          command: sleep 1
-      - run:
-          name: "before_test: setup db"
-          command: docker-compose run web rails db:create db:migrate
-      - run:
           name: bundle exec rspec
-          # command: docker-compose run web bundle exec rspec
-          command: docker-compose run web bundle exec rspec spec/models/
+          command: docker-compose run web bundle exec rspec
       - run:
           name: docker-compose down
           command: docker-compose down
@@ -74,10 +64,14 @@ workflows:
   version: 2
   test-deploy:
     jobs:
-      - test
-      - deploy:
-          requires:
-            - test
+      # - test
+      - test:
           filters:
             branches:
               only: master
+      # - deploy:
+      #     requires:
+      #       - test
+      #     filters:
+      #       branches:
+      #         only: master
