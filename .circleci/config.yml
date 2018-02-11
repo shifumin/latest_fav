@@ -64,10 +64,14 @@ workflows:
   version: 2
   test-deploy:
     jobs:
-      - test
-      - deploy:
-          requires:
-            - test
+      # - test
+      - test:
           filters:
             branches:
               only: master
+      # - deploy:
+      #     requires:
+      #       - test
+      #     filters:
+      #       branches:
+      #         only: master
