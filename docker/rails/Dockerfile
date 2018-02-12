@@ -1,6 +1,9 @@
 FROM ruby:2.5.0
 ENV LANG C.UTF-8
 
+ARG AWS_ACCESS_KEY_ID
+ARG AWS_SECRET_ACCESS_KEY
+
 RUN apt-get update -qq && \
     apt-get install -y build-essential \
                        apt-transport-https \

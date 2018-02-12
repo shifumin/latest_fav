@@ -4,6 +4,9 @@ services:
     build:
       context: .
       dockerfile: ./docker/rails/Dockerfile
+      args:
+            AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+            AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
     tty: true
     stdin_open: true
     environment:
