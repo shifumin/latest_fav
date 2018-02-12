@@ -25,6 +25,10 @@ COPY yarn.lock /rails_app/yarn.lock
 
 RUN bundle install --jobs=4 --no-cache
 COPY . /rails_app
-# RUN cp config/encrypted_secrets.yml config/secrets.yml
+RUN bundle exec yaml_vault decrypt config/encrypted_secrets.yml \
+    -o config/secrets.yml --cryptor=aws-kms \
+    --aws-region=ap-northeast-1 \
+    --aws-access-key-id=$AWS_ACCESS_KEY_ID \
+    --aws-secret-access-key=$AWS_SECRET_ACCESS_KEY
 
 EXPOSE 3000
